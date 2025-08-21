@@ -1,0 +1,41 @@
+javascript:(async function(){
+  const s=document.createElement('style');
+  s.textContent='pfd-interactive-preview, pfd-interactive-preview .interactive-preview{width:100vw!important;height:85vh!important;display:block!important}pfd-interactive-preview canvas.canvas{width:100%!important;height:100%!important;display:block!important}';
+  document.head.appendChild(s);
+  window.dispatchEvent(new Event('resize'));
+  try{window.BABYLON?.Engine?.LastCreatedEngine?.resize();}catch(e){}
+  (function(){
+    const g=window;
+    const scene=g.BABYLON?.Engine?.LastCreatedScene||g.BABYLON?.Scene?.LastCreatedScene||(g.BABYLON?.Engine?.LastCreatedEngine?g.BABYLON.Engine.LastCreatedEngine.scenes?.[0]:null);
+    if(scene){
+      const cam=scene.activeCamera||scene.cameras?.[0];
+      if(cam){
+        const speed=0.003;
+        const cb=()=>{if(cam.alpha!==undefined)cam.alpha+=speed;else if(cam.rotation)cam.rotation.y+=speed;};
+        scene.__spinCB&&scene.onBeforeRenderObservable.remove(scene.__spinCB);
+        scene.__spinCB=cb;
+        scene.onBeforeRenderObservable.add(cb);
+      }
+    }
+  })();
+  const c=document.querySelector('pfd-interactive-preview canvas.canvas');
+  if(!c){alert('Canvas not found');return;}
+  const stream=c.captureStream?c.captureStream(60):null;
+  if(!stream){alert('captureStream not supported');return;}
+  const types=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+  let mime=types.find(t=>MediaRecorder.isTypeSupported?.(t))||'video/webm';
+  const chunks=[];
+  const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:12000000}); // higher bitrate for 60fps
+  rec.ondataavailable=e=>e.data&&chunks.push(e.data);
+  const done=new Promise(r=>rec.onstop=()=>r());
+  rec.start(100);
+  setTimeout(()=>rec.stop(),30000); // 30 seconds
+  await done;
+  const blob=new Blob(chunks,{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='preview-60fps.webm';
+  a.click();
+  URL.revokeObjectURL(url);
+})();
