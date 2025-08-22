@@ -1,4 +1,4 @@
-javascript:(function(){const vw=parseInt(prompt('Preview width (vw)?','90')||'90',10);const vh=parseInt(prompt('Preview height (vh)?','80')||'80',10);const css=`
+javascript:(function(){const vw=parseInt('90',10);const vh=parseInt('80',10);const css=`
 pfy-accordion-item .content{width:${vw}vw!important;min-width:${vw}vw!important;max-width:none!important;height:${vh}vh!important;min-height:${vh}vh!important;max-height:none!important;overflow:visible!important;}
 pfd-interactive-preview,pfd-interactive-preview .interactive-preview{width:100%!important;height:100%!important;display:block!important;overflow:visible!important;}
 pfd-interactive-preview canvas.canvas{width:100%!important;height:100%!important;display:block!important;}
