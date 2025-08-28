@@ -29,7 +29,7 @@ javascript:(async function(){
   rec.ondataavailable=e=>e.data&&chunks.push(e.data);
   const done=new Promise(r=>rec.onstop=()=>r());
   rec.start(100);
-  setTimeout(()=>rec.stop(),30000); // 30 seconds
+  setTimeout(()=>rec.stop(),20000); // 20 seconds
   await done;
   const blob=new Blob(chunks,{type:mime});
   const url=URL.createObjectURL(blob);
